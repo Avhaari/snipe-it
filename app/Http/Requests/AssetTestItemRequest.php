@@ -13,9 +13,10 @@ class AssetTestItemRequest extends Request
     {
         return [
             'asset_test_run_id' => 'sometimes|exists:asset_test_runs,id',
-            'component' => 'required|in:keyboard,screen,touchpad,usb,sd,dvd,vga,hdmi,cpu_stress,battery,ram,webcam,mic,speakers,wifi,bluetooth,ethernet,fingerprint',
+            'component' => 'required|string',
             'status' => 'required|in:pass,fail,na',
             'notes' => 'nullable|string',
+            'completed_at' => 'nullable|date',
         ];
     }
 }

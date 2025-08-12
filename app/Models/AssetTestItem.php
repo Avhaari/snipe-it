@@ -12,6 +12,11 @@ class AssetTestItem extends Model
         'component',
         'status',
         'notes',
+        'completed_at',
+    ];
+
+    protected $casts = [
+        'completed_at' => 'datetime',
     ];
 
     public function run(): BelongsTo

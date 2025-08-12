@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('component');
             $table->enum('status', ['pass','fail','na']);
             $table->text('notes')->nullable();
+            $table->timestamp('completed_at')->nullable();
             $table->timestamps();
             $table->index(['asset_test_run_id', 'component']);
         });

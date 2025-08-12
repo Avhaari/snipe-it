@@ -22,6 +22,8 @@ class AssetTestRunController extends Controller
         $this->authorize('create', AssetTestRun::class);
         $asset->testRuns()->create([
             'user_id' => auth()->id(),
+            'test_type' => $request->input('test_type'),
+            'status' => $request->input('status', 'in_progress'),
             'os_version' => $request->input('os_version'),
             'notes' => $request->input('notes'),
             'started_at' => $request->input('started_at'),

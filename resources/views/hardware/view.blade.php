@@ -46,7 +46,7 @@
             </div>
         @endif
 
-        @if ($latestRun && $latestRun->all_passed)
+        @if ($latestRun && $latestRun->status === 'completed' && $latestRun->all_passed)
             <div class="col-md-12">
                 <div class="callout callout-success">
                     Alle tests geslaagd
@@ -1440,11 +1440,13 @@
                         <ul class="list-group mt-3">
                         @foreach($asset->testRuns->sortByDesc('created_at') as $run)
                             <li class="list-group-item">
-                                {{ Helper::getFormattedDateObject($run->created_at, 'datetime', false) }}
-                                @if($run->all_passed)
-                                    <span class="badge badge-success">OK</span>
-                                @else
-                                    <span class="badge badge-danger">FAIL</span>
+                                {{ Helper::getFormattedDateObject($run->created_at, 'datetime', false) }} - {{ $run->status }}
+                                @if($run->status === 'completed')
+                                    @if($run->all_passed)
+                                        <span class="badge badge-success">OK</span>
+                                    @else
+                                        <span class="badge badge-danger">FAIL</span>
+                                    @endif
                                 @endif
                                 <ul>
                                     @foreach($run->items as $item)
@@ -1491,6 +1493,10 @@
                         <div class="form-group">
                             <label>OS Version</label>
                             <input type="text" name="os_version" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Test Type</label>
+                            <input type="text" name="test_type" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Started at</label>

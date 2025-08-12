@@ -5,7 +5,7 @@ This feature lets refurbishers record hardware test runs on assets.
 ## Web UI
 * Open an asset detail page and select the **Tests** tab.
 * Use **Nieuwe testrun** to log a run and record component results.
-* A green banner "Alle tests geslaagd" appears when the latest run has no failures.
+* A green banner "Alle tests geslaagd" appears when the latest completed run has no failures.
 
 ## API
 ```
@@ -22,7 +22,18 @@ PATCH /api/v1/test-runs/{run}/items/{item}
 Run payload example:
 ```json
 {
+  "test_type": "mobile",
+  "status": "in_progress",
   "os_version": "Ubuntu 22.04",
   "started_at": "2025-01-01T10:00:00Z"
+}
+```
+
+Item payload example:
+```json
+{
+  "component": "keyboard",
+  "status": "pass",
+  "completed_at": "2025-01-01T10:15:00Z"
 }
 ```

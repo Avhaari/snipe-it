@@ -11,6 +11,8 @@ class AssetTestRun extends Model
     protected $fillable = [
         'asset_id',
         'user_id',
+        'test_type',
+        'status',
         'os_version',
         'notes',
         'started_at',
@@ -20,6 +22,7 @@ class AssetTestRun extends Model
     protected $casts = [
         'started_at' => 'datetime',
         'finished_at' => 'datetime',
+        'status' => 'string',
     ];
 
     public function asset(): BelongsTo

@@ -16,6 +16,8 @@ class AssetTestRunTest extends TestCase
 
     protected function setUp(): void
     {
+        putenv('DB_CONNECTION=sqlite');
+        putenv('DB_DATABASE=:memory:');
         parent::setUp();
         config(['auth.guards.api.driver' => 'session']);
     }
@@ -41,19 +43,38 @@ class AssetTestRunTest extends TestCase
         $this->actingAs($user, 'api')->postJson('/api/v1/test-runs/'.$run->id.'/items', [
             'component' => 'keyboard',
             'status' => 'pass',
+            'completed_at' => now()->toISOString(),
         ])->assertStatus(201);
 
+        $this->assertSame('in_progress', $run->fresh()->status);
         $this->assertTrue($run->fresh()->all_passed);
     }
 
-    public function test_packer_cannot_create_run(): void
+    public function test_refurbisher_cannot_delete_run(): void
+    {
+        $user = $this->createUserWithRole('refurbisher');
+        $asset = Asset::factory()->create();
+        $run = AssetTestRun::create([
+            'asset_id' => $asset->id,
+            'user_id' => $user->id,
+        ]);
+
+        $this->actingAs($user)->delete(route('hardware.test-runs.destroy', $run))
+            ->assertForbidden();
+    }
+
+    public function test_packer_can_delete_run(): void
     {
         $user = $this->createUserWithRole('packer');
         $asset = Asset::factory()->create();
+        $run = AssetTestRun::create([
+            'asset_id' => $asset->id,
+            'user_id' => $user->id,
+        ]);
 
-        $this->actingAs($user)->post(route('hardware.test-runs.store', $asset), [
-            'os_version' => '1.0',
-        ])->assertForbidden();
+        $this->actingAs($user)->delete(route('hardware.test-runs.destroy', $run))
+            ->assertRedirect();
+        $this->assertDatabaseMissing('asset_test_runs', ['id' => $run->id]);
     }
 
     public function test_all_passed_false_with_fail(): void
