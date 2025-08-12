@@ -24,7 +24,6 @@ use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StatuslabelsController;
 use App\Http\Controllers\SuppliersController;
 use App\Http\Controllers\ViewAssetsController;
-use App\Http\Controllers\AssetTestController;
 use App\Livewire\Importer;
 use App\Models\ReportTemplate;
 use Illuminate\Support\Facades\Route;
@@ -704,11 +703,6 @@ Route::withoutMiddleware(['web'])->get(
     '/health',
     [HealthController::class, 'get']
 )->name('health');
-Route::middleware(['auth'])->group(function () {
-    Route::get('/hardware/{asset}/tests', [AssetTestController::class, 'index'])->name('asset-tests.index');
-    Route::post('/hardware/{asset}/tests', [AssetTestController::class, 'store'])->name('asset-tests.store');
-});
-
 
 
 Route::middleware(['auth'])->get(
