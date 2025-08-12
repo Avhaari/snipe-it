@@ -22,7 +22,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('asset_test_run_id')->constrained('asset_test_runs')->cascadeOnDelete();
             $table->string('component');
-            $table->enum('status', ['pass','fail','na']);
+            $table->enum('status', ['pass','fail','na'])->default('na');
             $table->text('notes')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();

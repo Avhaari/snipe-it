@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Statuslabel;
 
 class AssetTestRun extends Model
 {
@@ -24,6 +25,24 @@ class AssetTestRun extends Model
         'finished_at' => 'datetime',
         'status' => 'string',
     ];
+
+    protected static function booted()
+    {
+        static::saved(function (self $run) {
+            if (
+                $run->status === 'completed' &&
+                $run->all_passed &&
+                config('test-runs.auto_complete')
+            ) {
+                $statusId = Statuslabel::where('name', 'Ready to Deploy')->value('id');
+                if ($statusId) {
+                    $asset = $run->asset;
+                    $asset->status_id = $statusId;
+                    $asset->save();
+                }
+            }
+        });
+    }
 
     public function asset(): BelongsTo
     {
