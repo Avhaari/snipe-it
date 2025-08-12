@@ -12,6 +12,7 @@ use App\Models\Traits\Searchable;
 use App\Presenters\Presentable;
 use App\Presenters\AssetPresenter;
 use Carbon\Carbon;
+use App\Models\AssetTestRun;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -760,6 +761,11 @@ class Asset extends Depreciable
     {
         return $this->hasMany(\App\Models\AssetMaintenance::class, 'asset_id')
             ->orderBy('created_at', 'desc');
+    }
+
+    public function testRuns()
+    {
+        return $this->hasMany(AssetTestRun::class);
     }
 
     /**

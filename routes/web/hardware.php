@@ -10,6 +10,7 @@ use App\Models\Setting;
 use Tabuna\Breadcrumbs\Trail;
 use Illuminate\Support\Facades\Route;
 use App\Models\Asset;
+use App\Http\Controllers\AssetTestRunController;
 
 /*
 |--------------------------------------------------------------------------
@@ -185,6 +186,12 @@ Route::group(
         Route::post('bulkcheckout',
             [BulkAssetsController::class, 'storeCheckout']
         )->name('hardware.bulkcheckout.store');
+
+        // Asset test runs
+        Route::get('{asset}/tests', [AssetTestRunController::class, 'index'])->name('hardware.test-runs.index');
+        Route::post('{asset}/tests', [AssetTestRunController::class, 'store'])->name('hardware.test-runs.store');
+        Route::patch('tests/{run}', [AssetTestRunController::class, 'update'])->name('hardware.test-runs.update');
+        Route::delete('tests/{run}', [AssetTestRunController::class, 'destroy'])->name('hardware.test-runs.destroy');
 
     });
 
