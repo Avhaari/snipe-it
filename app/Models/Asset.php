@@ -763,16 +763,6 @@ class Asset extends Depreciable
     }
 
     /**
-     * Asset repeatable tests.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function tests()
-    {
-        return $this->hasMany(\App\Models\AssetTest::class);
-    }
-
-    /**
      * Get user who created the item
      *
      * @author [A. Gianotto] [<snipe@snipe.net>]
