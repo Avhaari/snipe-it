@@ -310,7 +310,9 @@ class AssetsController extends Controller
                 'url' => route('qr_code/hardware', $asset),
             ];
 
-            return view('hardware/view', compact('asset', 'qr_code', 'settings'))
+            $asset->load(['testRuns.items']);
+            $latestRun = $asset->testRuns->sortByDesc('created_at')->first();
+            return view('hardware/view', compact('asset', 'qr_code', 'settings', 'latestRun'))
                 ->with('use_currency', $use_currency)->with('audit_log', $audit_log);
         }
 

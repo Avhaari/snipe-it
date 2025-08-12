@@ -602,7 +602,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'api-throttle:api']], fu
         /**
          * Asset maintenances API routes
          */
-        Route::resource('maintenances', 
+        Route::resource('maintenances',
         Api\AssetMaintenancesController::class,
         ['names' => [
                 'index' => 'api.maintenances.index',
@@ -615,6 +615,16 @@ Route::group(['prefix' => 'v1', 'middleware' => ['api', 'api-throttle:api']], fu
         'parameters' => ['maintenance' => 'maintenance_id'],
         ]
         ); // end assets API routes
+
+        // Asset test runs API routes
+        Route::get('assets/{asset}/test-runs', [Api\AssetTestRunsController::class, 'index']);
+        Route::post('assets/{asset}/test-runs', [Api\AssetTestRunsController::class, 'store']);
+        Route::get('test-runs/{run}', [Api\AssetTestRunsController::class, 'show']);
+        Route::patch('test-runs/{run}', [Api\AssetTestRunsController::class, 'update']);
+        Route::delete('test-runs/{run}', [Api\AssetTestRunsController::class, 'destroy']);
+        Route::get('test-runs/{run}/items', [Api\AssetTestRunsController::class, 'items']);
+        Route::post('test-runs/{run}/items', [Api\AssetTestRunsController::class, 'storeItem']);
+        Route::patch('test-runs/{run}/items/{item}', [Api\AssetTestRunsController::class, 'updateItem']);
 
 
       /**
