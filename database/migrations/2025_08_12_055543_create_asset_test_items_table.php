@@ -9,6 +9,12 @@ return new class extends Migration
     public function up(): void
     {
         if (Schema::hasTable('asset_test_items')) {
+            Schema::table('asset_test_items', function (Blueprint $table) {
+                if (!Schema::hasColumn('asset_test_items', 'completed_at')) {
+                    $table->timestamp('completed_at')->nullable()->after('notes');
+                }
+            });
+
             return;
         }
 
