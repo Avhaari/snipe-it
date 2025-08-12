@@ -14,6 +14,12 @@ class AssetTestRunTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['auth.guards.api.driver' => 'session']);
+    }
+
     protected function createUserWithRole(string $role): User
     {
         $group = Group::create(['name' => $role]);
@@ -32,7 +38,7 @@ class AssetTestRunTest extends TestCase
         ])->assertRedirect();
 
         $run = AssetTestRun::first();
-        $this->actingAs($user)->postJson('/api/v1/test-runs/'.$run->id.'/items', [
+        $this->actingAs($user, 'api')->postJson('/api/v1/test-runs/'.$run->id.'/items', [
             'component' => 'keyboard',
             'status' => 'pass',
         ])->assertStatus(201);

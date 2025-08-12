@@ -10,8 +10,10 @@ return new class extends Migration
     {
         Schema::create('asset_test_runs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('asset_id')->constrained('assets')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->restrictOnDelete();
+            $table->unsignedInteger('asset_id');
+            $table->unsignedInteger('user_id');
+            $table->foreign('asset_id')->references('id')->on('assets')->cascadeOnDelete();
+            $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();
             $table->string('os_version')->nullable();
             $table->text('notes')->nullable();
             $table->dateTime('started_at')->nullable();
