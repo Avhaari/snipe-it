@@ -22,11 +22,12 @@ PATCH /api/v1/test-runs/{run}/items/{item}
 Run payload example:
 ```json
 {
-  "test_type": "mobile",
+  "test_type": "laptop",
   "status": "in_progress",
   "os_version": "Ubuntu 22.04"
 }
 ```
+`test_type` defaults to `laptop`; additional types may be added later.
 `started_at` is set automatically when the run is created.
 
 Item payload example:

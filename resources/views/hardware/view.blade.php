@@ -1496,7 +1496,9 @@
                         </div>
                         <div class="form-group">
                             <label>Test Type</label>
-                            <input type="text" name="test_type" class="form-control">
+                            <select name="test_type" class="form-control">
+                                <option value="laptop" selected>Laptop</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Notities</label>

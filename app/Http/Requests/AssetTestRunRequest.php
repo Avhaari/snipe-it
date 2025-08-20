@@ -12,7 +12,7 @@ class AssetTestRunRequest extends Request
     public function rules()
     {
         return [
-            'test_type' => 'nullable|string',
+            'test_type' => 'nullable|in:laptop',
             'status' => 'nullable|in:in_progress,completed',
             'os_version' => 'nullable|string',
             'notes' => 'nullable|string',
