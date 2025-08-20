@@ -30,7 +30,15 @@ class AssetTestRunsController extends Controller
             'started_at' => now(),
             'finished_at' => $request->finished_at,
         ]);
-        return response()->json($run, 201);
+
+        foreach (AssetTestItem::COMPONENTS as $component) {
+            $run->items()->create([
+                'component' => $component,
+                'status' => 'na',
+            ]);
+        }
+
+        return response()->json($run->load('items'), 201);
     }
 
     public function show(AssetTestRun $run)

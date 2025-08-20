@@ -19,8 +19,9 @@ return new class extends Migration
         }
 
         Schema::create('asset_test_items', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('asset_test_run_id')->constrained('asset_test_runs')->cascadeOnDelete();
+            $table->increments('id');
+            $table->unsignedInteger('asset_test_run_id');
+            $table->foreign('asset_test_run_id')->references('id')->on('asset_test_runs')->onDelete('cascade');
             $table->string('component');
             $table->enum('status', ['pass','fail','na'])->default('na');
             $table->text('notes')->nullable();

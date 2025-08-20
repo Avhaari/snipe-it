@@ -23,11 +23,11 @@ return new class extends Migration
         }
 
         Schema::create('asset_test_runs', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->unsignedInteger('asset_id');
             $table->unsignedInteger('user_id');
-            $table->foreign('asset_id')->references('id')->on('assets')->cascadeOnDelete();
-            $table->foreign('user_id')->references('id')->on('users')->restrictOnDelete();
+            $table->foreign('asset_id')->references('id')->on('assets')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
             $table->string('test_type')->nullable();
             $table->enum('status', ['in_progress', 'completed'])->default('in_progress');
             $table->string('os_version')->nullable();

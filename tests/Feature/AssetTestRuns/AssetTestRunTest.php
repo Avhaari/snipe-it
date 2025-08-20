@@ -40,13 +40,16 @@ class AssetTestRunTest extends TestCase
             'os_version' => '1.0',
         ])->assertRedirect();
 
-        $run = AssetTestRun::first();
+        $run = AssetTestRun::with('items')->first();
         $this->assertNotNull($run->started_at);
-        $this->actingAs($user, 'api')->postJson('/api/v1/test-runs/'.$run->id.'/items', [
-            'component' => 'keyboard',
+        $this->assertCount(count(AssetTestItem::COMPONENTS), $run->items);
+
+        $item = $run->items()->where('component', 'keyboard')->first();
+        $this->actingAs($user, 'api')->patchJson('/api/v1/test-runs/'.$run->id.'/items/'.$item->id, [
             'status' => 'pass',
             'completed_at' => now()->toISOString(),
-        ])->assertStatus(201);
+            'component' => 'keyboard',
+        ])->assertOk();
 
         $this->assertSame('in_progress', $run->fresh()->status);
         $this->assertTrue($run->fresh()->all_passed);

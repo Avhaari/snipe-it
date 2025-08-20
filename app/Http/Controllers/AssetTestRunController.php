@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AssetTestRunRequest;
 use App\Models\Asset;
 use App\Models\AssetTestRun;
+use App\Models\AssetTestItem;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -20,7 +21,7 @@ class AssetTestRunController extends Controller
     public function store(AssetTestRunRequest $request, Asset $asset): RedirectResponse
     {
         $this->authorize('create', AssetTestRun::class);
-        $asset->testRuns()->create([
+        $run = $asset->testRuns()->create([
             'user_id' => auth()->id(),
             'test_type' => $request->input('test_type'),
             'status' => $request->input('status', 'in_progress'),
@@ -29,6 +30,14 @@ class AssetTestRunController extends Controller
             'started_at' => now(),
             'finished_at' => $request->input('finished_at'),
         ]);
+
+        foreach (AssetTestItem::COMPONENTS as $component) {
+            $run->items()->create([
+                'component' => $component,
+                'status' => 'na',
+            ]);
+        }
+
         return redirect()->route('hardware.show', $asset);
     }
 
