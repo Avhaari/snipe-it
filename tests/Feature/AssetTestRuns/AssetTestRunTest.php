@@ -38,21 +38,21 @@ class AssetTestRunTest extends TestCase
 
         $this->actingAs($user)->post(route('hardware.test-runs.store', $asset), [
             'os_version' => '1.0',
+            'items' => [
+                'keyboard' => ['status' => 'pass', 'notes' => 'ok'],
+                'screen' => ['status' => 'fail'],
+            ],
         ])->assertRedirect();
 
         $run = AssetTestRun::with('items')->first();
         $this->assertNotNull($run->started_at);
         $this->assertCount(count(AssetTestItem::COMPONENTS), $run->items);
-
-        $item = $run->items()->where('component', 'keyboard')->first();
-        $this->actingAs($user, 'api')->patchJson('/api/v1/test-runs/'.$run->id.'/items/'.$item->id, [
-            'status' => 'pass',
-            'completed_at' => now()->toISOString(),
-            'component' => 'keyboard',
-        ])->assertOk();
+        $this->assertSame('pass', $run->items()->where('component', 'keyboard')->first()->status);
+        $this->assertSame('fail', $run->items()->where('component', 'screen')->first()->status);
+        $this->assertSame('na', $run->items()->where('component', 'touchpad')->first()->status);
 
         $this->assertSame('in_progress', $run->fresh()->status);
-        $this->assertTrue($run->fresh()->all_passed);
+        $this->assertFalse($run->all_passed);
     }
 
     public function test_refurbisher_cannot_delete_run(): void

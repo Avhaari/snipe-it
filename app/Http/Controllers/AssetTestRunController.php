@@ -31,10 +31,13 @@ class AssetTestRunController extends Controller
             'finished_at' => $request->input('finished_at'),
         ]);
 
+        $items = $request->input('items', []);
         foreach (AssetTestItem::COMPONENTS as $component) {
+            $data = $items[$component] ?? [];
             $run->items()->create([
                 'component' => $component,
-                'status' => 'na',
+                'status' => $data['status'] ?? 'na',
+                'notes' => $data['notes'] ?? null,
             ]);
         }
 

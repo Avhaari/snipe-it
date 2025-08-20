@@ -17,6 +17,9 @@ class AssetTestRunRequest extends Request
             'os_version' => 'nullable|string',
             'notes' => 'nullable|string',
             'finished_at' => 'nullable|date',
+            'items' => 'nullable|array',
+            'items.*.status' => 'nullable|in:pass,fail,na',
+            'items.*.notes' => 'nullable|string',
         ];
     }
 }

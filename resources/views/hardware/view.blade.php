@@ -1502,6 +1502,32 @@
                             <label>Notities</label>
                             <textarea name="notes" class="form-control" rows="3"></textarea>
                         </div>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Status</th>
+                                    <th>Opmerking</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(\App\Models\AssetTestItem::COMPONENTS as $component)
+                                    <tr>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $component)) }}</td>
+                                        <td>
+                                            <select name="items[{{ $component }}][status]" class="form-control">
+                                                <option value="pass">Pass</option>
+                                                <option value="fail">Fail</option>
+                                                <option value="na" selected>N.v.t.</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="items[{{ $component }}][notes]" class="form-control">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">{{ trans('general.save') }}</button>
