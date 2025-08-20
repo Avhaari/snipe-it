@@ -37,3 +37,28 @@ Item payload example:
   "completed_at": "2025-01-01T10:15:00Z"
 }
 ```
+
+## Component whitelist
+
+The API and UI accept the following component names for laptop and desktop tests:
+
+- `keyboard`
+- `screen`
+- `touchpad`
+- `usb`
+- `sd`
+- `dvd`
+- `vga`
+- `hdmi`
+- `cpu_stress`
+- `battery`
+- `ram`
+- `webcam`
+- `mic`
+- `speakers`
+- `wifi`
+- `bluetooth`
+- `ethernet`
+- `fingerprint`
+
+Components outside this list are rejected during validation.
