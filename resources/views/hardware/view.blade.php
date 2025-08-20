@@ -1502,10 +1502,6 @@
                             <label>Notities</label>
                             <textarea name="notes" class="form-control" rows="3"></textarea>
                         </div>
-                        <div class="form-group">
-                            <label>Started at</label>
-                            <input type="datetime-local" name="started_at" class="form-control">
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">{{ trans('general.save') }}</button>

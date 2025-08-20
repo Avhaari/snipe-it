@@ -24,10 +24,10 @@ Run payload example:
 {
   "test_type": "mobile",
   "status": "in_progress",
-  "os_version": "Ubuntu 22.04",
-  "started_at": "2025-01-01T10:00:00Z"
+  "os_version": "Ubuntu 22.04"
 }
 ```
+`started_at` is set automatically when the run is created.
 
 Item payload example:
 ```json

@@ -26,7 +26,7 @@ class AssetTestRunController extends Controller
             'status' => $request->input('status', 'in_progress'),
             'os_version' => $request->input('os_version'),
             'notes' => $request->input('notes'),
-            'started_at' => $request->input('started_at'),
+            'started_at' => now(),
             'finished_at' => $request->input('finished_at'),
         ]);
         return redirect()->route('hardware.show', $asset);
@@ -35,7 +35,7 @@ class AssetTestRunController extends Controller
     public function update(AssetTestRunRequest $request, AssetTestRun $run): RedirectResponse
     {
         $this->authorize('update', $run);
-        $run->update($request->validated());
+        $run->update($request->safe()->except('started_at'));
         return redirect()->back();
     }
 

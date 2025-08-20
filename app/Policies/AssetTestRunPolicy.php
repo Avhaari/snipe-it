@@ -17,12 +17,12 @@ class AssetTestRunPolicy
 
     public function viewAny(User $user): bool
     {
-        return $this->hasRole($user, ['refurbisher', 'packer', 'supervisor', 'admin']);
+        return $this->hasRole($user, ['refurbisher', 'admin']);
     }
 
     public function view(User $user, AssetTestRun $run): bool
     {
-        return $this->hasRole($user, ['refurbisher', 'packer', 'supervisor', 'admin']);
+        return $this->hasRole($user, ['refurbisher', 'admin']);
     }
 
     public function create(User $user): bool
@@ -37,6 +37,6 @@ class AssetTestRunPolicy
 
     public function delete(User $user, AssetTestRun $run): bool
     {
-        return $this->hasRole($user, ['packer', 'supervisor', 'admin']);
+        return $this->hasRole($user, ['admin']);
     }
 }

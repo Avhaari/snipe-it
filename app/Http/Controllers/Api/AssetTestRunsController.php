@@ -27,7 +27,7 @@ class AssetTestRunsController extends Controller
             'status' => $request->status ?? 'in_progress',
             'os_version' => $request->os_version,
             'notes' => $request->notes,
-            'started_at' => $request->started_at,
+            'started_at' => now(),
             'finished_at' => $request->finished_at,
         ]);
         return response()->json($run, 201);
@@ -42,7 +42,7 @@ class AssetTestRunsController extends Controller
     public function update(AssetTestRunRequest $request, AssetTestRun $run)
     {
         $this->authorize('update', $run);
-        $run->update($request->validated());
+        $run->update($request->safe()->except('started_at'));
         return response()->json($run);
     }
 

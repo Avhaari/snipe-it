@@ -9,6 +9,7 @@ use App\Models\Group;
 use App\Models\User;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 
 class AssetTestRunTest extends TestCase
 {
@@ -40,6 +41,7 @@ class AssetTestRunTest extends TestCase
         ])->assertRedirect();
 
         $run = AssetTestRun::first();
+        $this->assertNotNull($run->started_at);
         $this->actingAs($user, 'api')->postJson('/api/v1/test-runs/'.$run->id.'/items', [
             'component' => 'keyboard',
             'status' => 'pass',
@@ -63,7 +65,7 @@ class AssetTestRunTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_packer_can_delete_run(): void
+    public function test_packer_cannot_delete_run(): void
     {
         $user = $this->createUserWithRole('packer');
         $asset = Asset::factory()->create();
@@ -72,9 +74,26 @@ class AssetTestRunTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        $this->actingAs($user)->delete(route('hardware.test-runs.destroy', $run))
-            ->assertRedirect();
-        $this->assertDatabaseMissing('asset_test_runs', ['id' => $run->id]);
+        $this->assertFalse(Gate::forUser($user)->allows('delete', $run));
+    }
+
+    public function test_invalid_component_rejected(): void
+    {
+        $user = $this->createUserWithRole('refurbisher');
+        $asset = Asset::factory()->create();
+        $run = AssetTestRun::create([
+            'asset_id' => $asset->id,
+            'user_id' => $user->id,
+        ]);
+
+        $this->actingAs($user, 'api')->postJson('/api/v1/test-runs/'.$run->id.'/items', [
+            'component' => 'invalid',
+            'status' => 'pass',
+        ]);
+        $this->assertDatabaseMissing('asset_test_items', [
+            'asset_test_run_id' => $run->id,
+            'component' => 'invalid',
+        ]);
     }
 
     public function test_all_passed_false_with_fail(): void

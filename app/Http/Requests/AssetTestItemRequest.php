@@ -16,7 +16,7 @@ class AssetTestItemRequest extends Request
     {
         return [
             'asset_test_run_id' => 'sometimes|exists:asset_test_runs,id',
-            'component' => ['required', Rule::in(AssetTestItem::COMPONENTS)],
+            'component' => 'required|in:' . implode(',', AssetTestItem::COMPONENTS),
             'status' => 'required|in:pass,fail,na',
             'notes' => 'nullable|string',
             'completed_at' => 'nullable|date',
