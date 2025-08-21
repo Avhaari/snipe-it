@@ -46,6 +46,14 @@
             </div>
         @endif
 
+        @if ($latestRun && $latestRun->status === 'completed' && $latestRun->all_passed)
+            <div class="col-md-12">
+                <div class="callout callout-success">
+                    Alle tests geslaagd
+                </div>
+            </div>
+        @endif
+
         <div class="col-md-12">
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs hidden-print">
@@ -144,6 +152,17 @@
                           </span>
                             <span class="hidden-xs hidden-sm">{{ trans('general.maintenances') }}
                                 {!! ($asset->assetmaintenances()->count() > 0 ) ? '<span class="badge badge-secondary">'.number_format($asset->assetmaintenances()->count()).'</span>' : '' !!}
+                          </span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a href="#tests" data-toggle="tab">
+                          <span class="hidden-lg hidden-md">
+                              <i class="fas fa-vial fa-2x"></i>
+                          </span>
+                            <span class="hidden-xs hidden-sm">Tests
+                                {!! ($asset->testRuns->count() > 0 ) ? '<span class="badge badge-secondary">'.number_format($asset->testRuns->count()).'</span>' : '' !!}
                           </span>
                         </a>
                     </li>
@@ -1414,6 +1433,31 @@
                         </div> <!-- /.row -->
                     </div> <!-- /.tab-pane history -->
 
+                    <div class="tab-pane fade" id="tests">
+                        @can('create', \App\Models\AssetTestRun::class)
+                            <button class="btn btn-primary" data-toggle="modal" data-target="#newTestRunModal">Nieuwe testrun</button>
+                        @endcan
+                        <ul class="list-group mt-3">
+                        @foreach($asset->testRuns->sortByDesc('created_at') as $run)
+                            <li class="list-group-item">
+                                {{ Helper::getFormattedDateObject($run->created_at, 'datetime', false) }} - {{ $run->status }}
+                                @if($run->status === 'completed')
+                                    @if($run->all_passed)
+                                        <span class="badge badge-success">OK</span>
+                                    @else
+                                        <span class="badge badge-danger">FAIL</span>
+                                    @endif
+                                @endif
+                                <ul>
+                                    @foreach($run->items as $item)
+                                        <li>{{ $item->component }}: {{ $item->status }}</li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @endforeach
+                        </ul>
+                    </div>
+
                     <div class="tab-pane fade" id="files">
                         <div class="row{{ ($asset->uploads->count() > 0 ) ? '' : ' hidden-print' }}">
                             <div class="col-md-12">
@@ -1435,6 +1479,64 @@
                     @endif
             </div><!-- /.tab-content -->
         </div><!-- nav-tabs-custom -->
+    </div>
+
+    <div class="modal fade" id="newTestRunModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('hardware.test-runs.store', $asset) }}">
+                    @csrf
+                    <div class="modal-header">
+                        <h4 class="modal-title">Nieuwe testrun</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>OS Version</label>
+                            <input type="text" name="os_version" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label>Test Type</label>
+                            <select name="test_type" class="form-control">
+                                <option value="laptop" selected>Laptop</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Notities</label>
+                            <textarea name="notes" class="form-control" rows="3"></textarea>
+                        </div>
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Component</th>
+                                    <th>Status</th>
+                                    <th>Opmerking</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(\App\Models\AssetTestItem::COMPONENTS as $component)
+                                    <tr>
+                                        <td>{{ ucfirst(str_replace('_', ' ', $component)) }}</td>
+                                        <td>
+                                            <select name="items[{{ $component }}][status]" class="form-control">
+                                                <option value="pass">Pass</option>
+                                                <option value="fail">Fail</option>
+                                                <option value="na" selected>N.v.t.</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <input type="text" name="items[{{ $component }}][notes]" class="form-control">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">{{ trans('general.save') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
     @can('update', \App\Models\Asset::class)

@@ -1,0 +1,117 @@
+<?php
+
+namespace Tests\Feature\AssetTestRuns;
+
+use App\Models\Asset;
+use App\Models\AssetTestRun;
+use App\Models\AssetTestItem;
+use App\Models\Group;
+use App\Models\User;
+use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
+
+class AssetTestRunTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        putenv('DB_CONNECTION=sqlite');
+        putenv('DB_DATABASE=:memory:');
+        parent::setUp();
+        config(['auth.guards.api.driver' => 'session']);
+    }
+
+    protected function createUserWithRole(string $role): User
+    {
+        $group = Group::create(['name' => $role]);
+        $user = User::factory()->create();
+        $user->groups()->attach($group);
+        return $user;
+    }
+
+    public function test_refurbisher_can_create_run_and_items(): void
+    {
+        $user = $this->createUserWithRole('refurbisher');
+        $asset = Asset::factory()->create();
+
+        $this->actingAs($user)->post(route('hardware.test-runs.store', $asset), [
+            'os_version' => '1.0',
+            'items' => [
+                'keyboard' => ['status' => 'pass', 'notes' => 'ok'],
+                'screen' => ['status' => 'fail'],
+            ],
+        ])->assertRedirect();
+
+        $run = AssetTestRun::with('items')->first();
+        $this->assertNotNull($run->started_at);
+        $this->assertCount(count(AssetTestItem::COMPONENTS), $run->items);
+        $this->assertSame('pass', $run->items()->where('component', 'keyboard')->first()->status);
+        $this->assertSame('fail', $run->items()->where('component', 'screen')->first()->status);
+        $this->assertSame('na', $run->items()->where('component', 'touchpad')->first()->status);
+
+        $this->assertSame('in_progress', $run->fresh()->status);
+        $this->assertFalse($run->all_passed);
+    }
+
+    public function test_refurbisher_cannot_delete_run(): void
+    {
+        $user = $this->createUserWithRole('refurbisher');
+        $asset = Asset::factory()->create();
+        $run = AssetTestRun::create([
+            'asset_id' => $asset->id,
+            'user_id' => $user->id,
+        ]);
+
+        $this->actingAs($user)->delete(route('hardware.test-runs.destroy', $run))
+            ->assertForbidden();
+    }
+
+    public function test_packer_cannot_delete_run(): void
+    {
+        $user = $this->createUserWithRole('packer');
+        $asset = Asset::factory()->create();
+        $run = AssetTestRun::create([
+            'asset_id' => $asset->id,
+            'user_id' => $user->id,
+        ]);
+
+        $this->assertFalse(Gate::forUser($user)->allows('delete', $run));
+    }
+
+    public function test_invalid_component_rejected(): void
+    {
+        $user = $this->createUserWithRole('refurbisher');
+        $asset = Asset::factory()->create();
+        $run = AssetTestRun::create([
+            'asset_id' => $asset->id,
+            'user_id' => $user->id,
+        ]);
+
+        $this->actingAs($user, 'api')->postJson('/api/v1/test-runs/'.$run->id.'/items', [
+            'component' => 'invalid',
+            'status' => 'pass',
+        ]);
+        $this->assertDatabaseMissing('asset_test_items', [
+            'asset_test_run_id' => $run->id,
+            'component' => 'invalid',
+        ]);
+    }
+
+    public function test_all_passed_false_with_fail(): void
+    {
+        $user = $this->createUserWithRole('refurbisher');
+        $asset = Asset::factory()->create();
+        $run = AssetTestRun::create([
+            'asset_id' => $asset->id,
+            'user_id' => $user->id,
+        ]);
+        AssetTestItem::create([
+            'asset_test_run_id' => $run->id,
+            'component' => 'keyboard',
+            'status' => 'fail',
+        ]);
+        $this->assertFalse($run->fresh()->all_passed);
+    }
+}
